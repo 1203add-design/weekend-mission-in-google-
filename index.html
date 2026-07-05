@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>睿晨的達克比任務中心 v12.2 (穩健同步版)</title>
+    <title>睿晨的達克比任務中心 v12.1 (穩健同步版)</title>
     <style>
         :root {
             --duck-mascot-url: url('https://cdn-icons-png.flaticon.com/512/1046/1046391.png'); 
@@ -22,8 +22,7 @@
             font-family: 'Segoe UI', '微軟正黑體', sans-serif;
             background-color: var(--paper-bg);
             background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0px, rgba(0,0,0,0.02) 2px, transparent 2px, transparent 4px);
-            background-size: 20px 20px;
-            margin: 0; padding: 20px; padding-bottom: 130px; 
+            background-size: 20px 20px; margin: 0; padding: 20px; padding-bottom: 130px; 
             color: var(--ink-color); user-select: none;
         }
 
@@ -71,19 +70,21 @@
         .t-afternoon { background: var(--afternoon-bg); }
         .t-evening { background: var(--evening-bg); }
         .time-label { font-weight: 900; font-size: 0.9rem; margin-bottom: 5px; display: block; color: var(--ink-color); }
+        .time-inputs-row { display: flex; align-items: center; gap: 3px; }
         .time-input { width: 32px; padding: 3px; text-align: center; border: 2px solid var(--ink-color); border-radius: 8px; font-weight: bold; font-size: 1rem; background: #fff; color: var(--ink-color); }
         
         .monitor-panel { margin-bottom: 25px; position: sticky; top: 0; z-index: 100; background: var(--paper-bg); padding: 15px 0; border-bottom: 4px solid var(--jungle-green); box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-left: -25px; margin-right: -25px; padding-left: 25px; padding-right: 25px; }
-        .total-time-text { text-align: center; margin-bottom: 5px; font-weight: 900; color: var(--jungle-green); font-size: 0.95rem; }
+        .total-time-text { text-align: center; margin-bottom: 5px; font-weight: 900; color: var(--jungle-green); font-size: 0.95rem; letter-spacing: 1px; }
         
         .bar-container { height: 35px; background: #ccc; border-radius: 5px; overflow: hidden; display: flex; position: relative; border: 3px solid var(--ink-color); }
-        .bar-tasks { height: 100%; background: var(--alert-red); width: 0%; transition: width 0.6s; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.9rem; font-weight: bold; background-image: linear-gradient(45deg, rgba(0,0,0,0.1) 25%, transparent 25%, transparent 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1) 75%, transparent 75%, transparent); background-size: 20px 20px; }
+        .bar-tasks { height: 100%; background: var(--alert-red); width: 0%; transition: width 0.6s; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.9rem; white-space: nowrap; font-weight: bold; background-image: linear-gradient(45deg, rgba(0,0,0,0.1) 25%, transparent 25%, transparent 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1) 75%, transparent 75%, transparent); background-size: 20px 20px; }
         .bar-free { height: 100%; background: #2a9d8f; width: 100%; transition: width 0.6s; display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 0.9rem; }
 
         .mission-grid { display: grid; gap: 12px; }
         .mission-item { display: flex; align-items: center; padding: 10px 15px; background: #fff; border-radius: 5px; transition: all 0.3s; border: 2px solid var(--ink-color); box-shadow: 4px 4px 0 rgba(38, 70, 83, 0.2); position: relative; }
         .mission-item::before { content: ""; position: absolute; left: -10px; top: 50%; transform: translateY(-50%); width: 20px; height: 30px; background: var(--earth-yellow); border-radius: 10px; z-index: -1; border: 2px solid var(--ink-color); }
-        .mission-item.completed { opacity: 0.7; background: #e9ecef; border-color: #adb5bd; }
+        .mission-item:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 rgba(38, 70, 83, 0.3); background: #f0fff0; }
+        .mission-item.completed { opacity: 0.7; background: #e9ecef; border-color: #adb5bd; box-shadow: none; transform: none; }
         .mission-item.completed .task-name { text-decoration: line-through; color: #adb5bd; }
         .mission-item[data-color="1"] { border-left: 8px solid var(--morning-bg); }
         .mission-item[data-color="2"] { border-left: 8px solid var(--afternoon-bg); }
@@ -102,11 +103,20 @@
         .ep-badge-container { position: relative; width: 120px; height: 120px; display: flex; justify-content: center; align-items: center; margin-top: -40px; }
         .ep-badge-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: var(--duck-badge-url); background-size: contain; background-repeat: no-repeat; background-position: center; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3)); }
         .ep-score-overlay { position: relative; z-index: 2; text-align: center; color: var(--ink-color); font-weight: 900; padding-top: 15px; padding-left: 5px; }
+        .ep-label { font-size: 0.8rem; display: block; color: var(--jungle-green); }
         .ep-score { font-size: 2.2rem; line-height: 1; text-shadow: 1px 1px 0 #fff; }
+        
         .tool-btn { background: #fff; color: var(--jungle-green); border: 3px solid var(--jungle-green); width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-size: 1.3rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 4px 0 rgba(0,0,0,0.2); }
-        .tool-btn:hover { transform: translateY(-3px); background: var(--earth-yellow); }
-        .add-btn { background: var(--jungle-green); color: var(--earth-yellow); border: 3px solid var(--ink-color); padding: 12px; border-radius: 10px; font-weight: 900; cursor: pointer; margin-top: 25px; width: 100%; font-size: 1.2rem; box-shadow: 5px 5px 0 var(--ink-color); }
-        .add-btn:hover { transform: translate(-2px, -2px); background: var(--ink-color); }
+        .tool-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 0 rgba(0,0,0,0.2); background: var(--earth-yellow); }
+        .btn-clear { background: var(--earth-yellow); }
+        .btn-reset { background: var(--alert-red); color: white; border-color: var(--ink-color); }
+        
+        .add-btn { background: var(--jungle-green); color: var(--earth-yellow); border: 3px solid var(--ink-color); padding: 12px; border-radius: 10px; font-weight: 900; cursor: pointer; margin-top: 25px; width: 100%; font-size: 1.2rem; box-shadow: 5px 5px 0 var(--ink-color); transition: transform 0.1s; letter-spacing: 1px; }
+        .add-btn:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--ink-color); background: var(--ink-color); }
+        .add-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--ink-color); }
+        
+        @keyframes badgeFlash { 0% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.1); filter: brightness(1.3) drop-shadow(0 0 15px var(--earth-yellow)); } 100% { transform: scale(1); filter: brightness(1); } }
+        .flash-active .ep-badge-img { animation: badgeFlash 0.5s ease-out; }
     </style>
 </head>
 <body>
@@ -116,120 +126,368 @@
         <div class="duck-mascot"></div>
         <div class="header-panel">
             <h1>🦖 睿晨的達克比任務中心</h1>
-            <div class="quote-box">達克比辦案，出發！</div>
+            <div class="quote-box">
+                <span id="quoteText">達克比辦案，出發！</span>
+            </div>
         </div>
     </div>
     
     <div class="tabs-wrapper" id="tabsWrapper"></div>
+
     <div class="time-config">
-        <div class="time-capsule t-morning"><span class="time-label">🌅 早上</span><div class="time-inputs-row"><input type="number" class="time-input" id="t_m_h"> : <input type="number" class="time-input" id="t_m_m"></div></div>
-        <div class="time-capsule t-afternoon"><span class="time-label">☀️ 下午</span><div class="time-inputs-row"><input type="number" class="time-input" id="t_a_h"> : <input type="number" class="time-input" id="t_a_m"></div></div>
-        <div class="time-capsule t-evening"><span class="time-label">🌙 晚上</span><div class="time-inputs-row"><input type="number" class="time-input" id="t_e_h"> : <input type="number" class="time-input" id="t_e_m"></div></div>
+        <div class="time-capsule t-morning">
+            <span class="time-label">🌅 早上</span>
+            <div class="time-inputs-row"><input type="number" class="time-input" id="t_m_h"> : <input type="number" class="time-input" id="t_m_m"></div>
+        </div>
+        <div class="time-capsule t-afternoon">
+            <span class="time-label">☀️ 下午</span>
+            <div class="time-inputs-row"><input type="number" class="time-input" id="t_a_h"> : <input type="number" class="time-input" id="t_a_m"></div>
+        </div>
+        <div class="time-capsule t-evening">
+            <span class="time-label">🌙 晚上</span>
+            <div class="time-inputs-row"><input type="number" class="time-input" id="t_e_h"> : <input type="number" class="time-input" id="t_e_m"></div>
+        </div>
     </div>
 
     <div class="monitor-panel">
         <div class="total-time-text" id="totalTimeText">等待任務數據...</div>
-        <div class="bar-container"><div class="bar-tasks" id="taskBar"></div><div class="bar-free" id="freeBar"></div></div>
+        <div class="bar-container">
+            <div class="bar-tasks" id="taskBar"></div>
+            <div class="bar-free" id="freeBar"></div>
+        </div>
     </div>
 
     <div id="missionContainer" class="mission-grid"></div>
     <button class="add-btn" onclick="addNewTask()">➕ 新增偵探任務 (New Case)</button>
 </div>
 
-<div class="ep-footer">
+<div class="ep-footer" id="epFooter">
     <div class="footer-inner">
         <div class="tools-group">
-            <button class="tool-btn" onclick="exportData()" title="匯出">📤</button>
-            <button class="tool-btn" onclick="importData()" title="匯入">📥</button>
+            <button class="tool-btn" onclick="exportData()" title="📤 匯出設定 (單機備用)">📤</button>
+            <button class="tool-btn" onclick="importData()" title="📥 匯入設定 (單機備用)">📥</button>
         </div>
-        <div class="ep-badge-container">
+        <div class="ep-badge-container" id="epBadge">
             <div class="ep-badge-img"></div>
-            <div class="ep-score-overlay"><span class="ep-label">EP</span><span class="ep-score" id="epScore">0</span></div>
+            <div class="ep-score-overlay">
+                <span class="ep-label">EP能量</span>
+                <span class="ep-score" id="epScore">0</span>
+            </div>
         </div>
         <div class="tools-group">
-            <button class="tool-btn btn-clear" onclick="clearCurrentDayTasks()" title="清空">🧹</button>
-            <button class="tool-btn btn-reset" onclick="resetAllData()" title="重置">↻</button>
+            <button class="tool-btn btn-clear" onclick="clearCurrentDayTasks()" title="🧹 清空今日任務">🧹</button>
+            <button class="tool-btn btn-reset" onclick="resetAllData()" title="重置所有資料">↻</button>
         </div>
     </div>
 </div>
 
 <script>
     const CLOUD_API_URL = "https://script.google.com/macros/s/AKfycbwqcwJehYjK5J-kvBGnXRfaJvnv3I8Fd4Zn3UzYRXd6hQJ72dLO1rAlrhGBbmAcF6xJ5A/exec"; 
-    let appData = { currentIdx: 0, days: [] };
     
-    window.onload = loadData;
+    let appData = { currentIdx: 0, days: [] };
+    const defaultTaskNames = ["📘 國語預習", "📝 國語複習", "📐 奧數挑戰", "🎓 英語 Tutor", "🔥 英語 Flame", "🎹 鋼琴練習", "📚 閱讀心得", "🏃 運動時間"];
+    
+    const quotes = [
+        "真相只有一個！", "觀察是科學的第一步。", "不要放過任何蛛絲馬跡！", "今天的實驗數據很完美。",
+        "專注！這可是大案件。", "你的大腦正在進化中！", "保持好奇，繼續探索！", "接受挑戰，你可以的！"
+    ];
+
+    window.onload = function() {
+        loadData(); rotateQuotes();
+    };
+
+    // 啟動防呆修復機制
+    function fallbackToLocal() {
+        const saved = localStorage.getItem('ruichen_mission_cloud');
+        if (saved) {
+            try {
+                let parsed = JSON.parse(saved);
+                if (parsed && parsed.days && Array.isArray(parsed.days) && parsed.days.length > 0) {
+                    appData = parsed;
+                    return;
+                }
+            } catch(e) { console.error("壞檔修復中..."); }
+        }
+        appData = { currentIdx: 0, days: [] };
+        createDayData("第 1 天");
+    }
 
     function loadData() {
-        // 使用 cache: 'no-store' 強制每次抓最新，繞過 Safari 快取
-        fetch(CLOUD_API_URL + "?t=" + new Date().getTime(), { cache: 'no-store', redirect: "follow" })
-            .then(res => res.json())
-            .then(data => {
-                appData = (data && data.days) ? data : { currentIdx: 0, days: [{ name: "第 1 天", time: [0,0,0,0,0,0], tasks: [], ep: 0 }] };
-                renderAll();
-            }).catch(() => {
-                appData = JSON.parse(localStorage.getItem('ruichen_mission_cloud')) || { currentIdx: 0, days: [{ name: "第 1 天", time: [0,0,0,0,0,0], tasks: [], ep: 0 }] };
-                renderAll();
+        document.getElementById('totalTimeText').innerText = "📡 正在連線至指揮中心雲端基地...";
+        
+        const noCacheUrl = CLOUD_API_URL + "?t=" + new Date().getTime();
+        
+        fetch(noCacheUrl, { redirect: "follow", cache: "no-store" })
+            .then(response => response.json())
+            .then(cloudData => {
+                if (cloudData && cloudData.days && Array.isArray(cloudData.days) && cloudData.days.length > 0) {
+                    appData = cloudData;
+                } else {
+                    fallbackToLocal();
+                }
+                renderTabs();
+                renderCurrentDay();
+                setupInputs();
+            })
+            .catch(error => {
+                console.error("雲端讀取失敗，啟用本機備援:", error);
+                fallbackToLocal();
+                renderTabs();
+                renderCurrentDay();
+                setupInputs();
             });
     }
     
-    function saveAll() {
+    function saveStorageOnly() {
         localStorage.setItem('ruichen_mission_cloud', JSON.stringify(appData));
+        
         fetch(CLOUD_API_URL, {
             method: "POST",
             mode: "no-cors",
+            redirect: "follow", 
             headers: { "Content-Type": "text/plain;charset=utf-8" },
             body: JSON.stringify(appData)
+        }).catch(error => console.error("雲端寫入失敗:", error));
+    }
+
+    function saveAndCalculate() {
+        captureCurrentPageData(); 
+        saveStorageOnly();
+        calculateTime();
+    }
+
+    function createDayData(name) {
+        appData.days.push({ 
+            name: name, time: [0,0,0,0,0,0], 
+            tasks: defaultTaskNames.map(n => ({ name: n, checked: false, period: '99', time: '' })), ep: 0 
         });
     }
 
-    function renderAll() { renderTabs(); renderCurrentDay(); setupInputs(); }
+    function captureCurrentPageData() {
+        if(appData.days.length === 0) return;
+        const currentDayObj = appData.days[appData.currentIdx];
+        
+        const tInps = document.querySelectorAll('.time-input');
+        let tArr = []; tInps.forEach(inp => tArr.push(parseInt(inp.value)||0));
+        currentDayObj.time = tArr;
+        
+        const container = document.getElementById('missionContainer');
+        let tTasks = [];
+        Array.from(container.children).forEach(div => {
+            tTasks.push({
+                name: div.querySelector('.task-name').value, 
+                checked: div.querySelector('.check-box').checked,
+                period: div.querySelector('.period-select').value, 
+                time: div.querySelector('.task-time-input').value
+            });
+        });
+        currentDayObj.tasks = tTasks;
+    }
 
     function renderTabs() {
         const wrapper = document.getElementById('tabsWrapper');
-        wrapper.innerHTML = `<button class="add-tab-btn" onclick="addNewDayTab()">+</button>`;
+        wrapper.innerHTML = '';
+        
         appData.days.forEach((day, idx) => {
             const btn = document.createElement('button');
             btn.className = `tab-btn ${idx === appData.currentIdx ? 'active' : ''}`;
             btn.innerText = day.name;
-            btn.onclick = () => { capture(); appData.currentIdx = idx; renderAll(); };
+            btn.onclick = () => switchTab(idx);
+            btn.ondblclick = () => renameTab(idx);
             wrapper.appendChild(btn);
         });
+        
+        const addBtn = document.createElement('button');
+        addBtn.className = 'add-tab-btn'; addBtn.innerText = '+'; addBtn.onclick = addNewDayTab;
+        wrapper.appendChild(addBtn);
+
+        const delBtn = document.createElement('button');
+        delBtn.className = 'del-tab-btn'; delBtn.innerText = '-'; delBtn.onclick = deleteCurrentDayTab;
+        wrapper.appendChild(delBtn);
     }
 
     function renderCurrentDay() {
+        if(appData.days.length === 0) return;
+        const data = appData.days[appData.currentIdx];
+        
+        const tInps = document.querySelectorAll('.time-input');
+        data.time.forEach((val, i) => tInps[i].value = val === 0 ? '' : val);
+        
+        document.getElementById('epScore').innerText = calculateTotalEP();
+        
         const container = document.getElementById('missionContainer');
         container.innerHTML = '';
-        appData.days[appData.currentIdx].tasks.forEach((task, i) => {
+        data.tasks.sort((a,b) => parseInt(a.period) - parseInt(b.period));
+        
+        data.tasks.forEach(task => {
             const div = document.createElement('div');
             div.className = `mission-item ${task.checked ? 'completed' : ''}`;
-            div.innerHTML = `<input type="checkbox" class="check-box" ${task.checked ? 'checked' : ''} onchange="toggleCheck(${i})">
-                             <input type="text" class="task-name" value="${task.name}" placeholder="輸入任務..." onchange="capture()">
-                             <input type="number" class="task-time-input" value="${task.time}" placeholder="分" onchange="capture()">
-                             <button class="btn-del" onclick="delTask(${i})">x</button>`;
+            div.setAttribute('data-color', task.period);
+            div.innerHTML = `
+                <input type="checkbox" class="check-box" ${task.checked ? 'checked' : ''} onchange="toggleCheck(this)">
+                <input type="text" class="task-name" value="${task.name}" placeholder="輸入任務..." onchange="saveAndCalculate()">
+                <input type="number" class="task-time-input" value="${task.time}" placeholder="分" onchange="saveAndCalculate()">
+                <select class="period-select" onchange="changePeriod(this)">
+                    <option value="99" ${task.period==99?'selected':''}>時段?</option>
+                    <option value="1" ${task.period==1?'selected':''}>早上</option>
+                    <option value="2" ${task.period==2?'selected':''}>下午</option>
+                    <option value="3" ${task.period==3?'selected':''}>晚上</option>
+                </select>
+                <button class="btn-del" onclick="deleteTask(this)">x</button>
+            `;
             container.appendChild(div);
         });
-        document.getElementById('epScore').innerText = appData.days[appData.currentIdx].tasks.filter(t => t.checked).length * 5;
+        calculateTime();
     }
 
-    function capture() {
-        appData.days[appData.currentIdx].tasks = Array.from(document.querySelectorAll('.mission-item')).map(div => ({
-            name: div.querySelector('.task-name').value,
-            checked: div.querySelector('.check-box').checked,
-            time: div.querySelector('.task-time-input').value
-        }));
-        saveAll();
+    function switchTab(idx) { saveAndCalculate(); appData.currentIdx = idx; renderTabs(); renderCurrentDay(); }
+    
+    function addNewDayTab() { 
+        saveAndCalculate(); createDayData(`第 ${appData.days.length + 1} 天`); 
+        appData.currentIdx = appData.days.length - 1; saveStorageOnly(); 
+        renderTabs(); renderCurrentDay(); 
     }
 
-    function toggleCheck(i) { appData.days[appData.currentIdx].tasks[i].checked = !appData.days[appData.currentIdx].tasks[i].checked; capture(); renderCurrentDay(); }
-    function delTask(i) { appData.days[appData.currentIdx].tasks.splice(i, 1); capture(); renderCurrentDay(); }
-    function addNewTask() { appData.days[appData.currentIdx].tasks.push({name: "", checked: false, time: ""}); renderCurrentDay(); }
-    function addNewDayTab() { appData.days.push({name: "新的一天", time: [0,0,0,0,0,0], tasks: [], ep: 0}); appData.currentIdx = appData.days.length - 1; saveAll(); renderAll(); }
-    function deleteCurrentDayTab() { if(appData.days.length > 1) { appData.days.splice(appData.currentIdx, 1); appData.currentIdx = 0; saveAll(); renderAll(); } }
-    function clearCurrentDayTasks() { appData.days[appData.currentIdx].tasks = []; saveAll(); renderCurrentDay(); }
+    function deleteCurrentDayTab() {
+        if(appData.days.length <= 1) { alert("⚠️ 達克比指揮官！只剩下一天了，不能再刪除囉！"); return; }
+        if(confirm(`確定要刪除「${appData.days[appData.currentIdx].name}」嗎？這天的案件記錄都會消失喔！`)) {
+            appData.days.splice(appData.currentIdx, 1);
+            if(appData.currentIdx >= appData.days.length) appData.currentIdx = appData.days.length - 1;
+            saveStorageOnly(); renderTabs(); renderCurrentDay();
+        }
+    }
+    
+    function clearCurrentDayTasks() {
+        if(confirm("確定要清空今天的任務清單嗎？(所有任務都會被刪除，但時間設定會保留)")) {
+            appData.days[appData.currentIdx].tasks = [];
+            saveStorageOnly(); renderCurrentDay();
+        }
+    }
+
+    function renameTab(idx) { 
+        const newName = prompt("幫這一天取個代號：", appData.days[idx].name); 
+        if(newName) { appData.days[idx].name = newName; saveStorageOnly(); renderTabs(); } 
+    }
+    
+    function changePeriod() { saveAndCalculate(); renderCurrentDay(); }
+    
+    function toggleCheck(checkbox) { 
+        if(checkbox.checked) { checkbox.parentElement.classList.add('completed'); triggerFlash(); } 
+        else { checkbox.parentElement.classList.remove('completed'); }
+        saveAndCalculate(); document.getElementById('epScore').innerText = calculateTotalEP();
+    }
+    
+    function calculateTotalEP() { 
+        let total = 0; 
+        if(appData.days[appData.currentIdx]) {
+            appData.days[appData.currentIdx].tasks.forEach(t => { if(t.checked) total += 5; }); 
+        }
+        return total; 
+    }
+    
+    function addNewTask() { 
+        captureCurrentPageData(); 
+        appData.days[appData.currentIdx].tasks.push({ name: "", checked: false, period: '99', time: '' }); 
+        saveStorageOnly(); renderCurrentDay(); 
+    }
+    
+    function deleteTask(btn) { if(confirm("確定刪除此任務？")) { btn.parentElement.remove(); saveAndCalculate(); } }
+    
+    function setupInputs() { document.querySelectorAll('.time-input').forEach(inp => { inp.addEventListener('change', saveAndCalculate); }); }
+    
+    function formatTime(minutes) {
+        const h = Math.floor(minutes / 60); const m = minutes % 60;
+        return h === 0 ? `${m}分` : `${h}時${m}分`;
+    }
+
+    function calculateTime() {
+        const tInps = document.querySelectorAll('.time-input');
+        let totalMin = 0;
+        totalMin += (parseInt(tInps[0].value)||0) * 60 + (parseInt(tInps[1].value)||0);
+        totalMin += (parseInt(tInps[2].value)||0) * 60 + (parseInt(tInps[3].value)||0);
+        totalMin += (parseInt(tInps[4].value)||0) * 60 + (parseInt(tInps[5].value)||0);
+
+        let usedMin = 0;
+        document.querySelectorAll('.task-time-input').forEach(input => { usedMin += parseInt(input.value) || 0; });
+        let freeMin = totalMin - usedMin;
+
+        document.getElementById('totalTimeText').innerText = totalMin > 0 ? `總行動時間：${Math.floor(totalMin/60)}小時 ${totalMin%60}分` : "請輸入時間膠囊數據...";
+
+        let usedPct = totalMin > 0 ? (usedMin / totalMin) * 100 : 0;
+        if(usedPct > 100) usedPct = 100;
+        
+        const taskBar = document.getElementById('taskBar');
+        const freeBar = document.getElementById('freeBar');
+
+        taskBar.style.width = `${usedPct}%`;
+        taskBar.innerText = usedPct > 5 ? `🚀 基地任務: ${formatTime(usedMin)}` : '';
+        freeBar.style.width = `${100 - usedPct}%`;
+        
+        if(freeMin < 0) {
+            freeBar.innerText = `⚠️ 時間透支: ${Math.abs(Math.floor(freeMin/60))}時${Math.abs(freeMin%60)}分`;
+            freeBar.style.background = "#636e72";
+        } else {
+            freeBar.innerText = freeMin >= 0 ? `🌿 自由探索: ${formatTime(freeMin)}` : '';
+            freeBar.style.background = "#2a9d8f";
+        }
+    }
+
+    // 解決重置卡死的問題：移除 location.reload()，並強制重新渲染畫面
     function resetAllData() { 
-        appData = { currentIdx: 0, days: [{name: "第 1 天", time: [0,0,0,0,0,0], tasks: [], ep: 0}] };
-        renderAll(); saveAll(); alert("✅ 已重置雲端與本機資料");
+        if(confirm("確定要重置所有資料嗎？所有的冒險記錄都會消失，且雲端資料也會同步清空喔！")) { 
+            appData = { currentIdx: 0, days: [] };
+            createDayData("第 1 天");
+            
+            renderTabs();
+            renderCurrentDay();
+            
+            localStorage.setItem('ruichen_mission_cloud', JSON.stringify(appData)); 
+            
+            fetch(CLOUD_API_URL, {
+                method: "POST",
+                mode: "no-cors",
+                redirect: "follow", 
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(appData)
+            }).catch(error => console.error("雲端重置失敗:", error));
+            
+            alert("✅ 資料已完全重置並上傳雲端！");
+        } 
+    }
+
+    function triggerFlash() { const badge = document.getElementById('epBadge'); badge.classList.remove('flash-active'); void badge.offsetWidth; badge.classList.add('flash-active'); }
+
+    let qIdx = 0;
+    function rotateQuotes() {
+        const el = document.getElementById('quoteText');
+        el.innerText = quotes[qIdx];
+        qIdx = (qIdx + 1) % quotes.length;
+        setTimeout(rotateQuotes, 10000); 
+    }
+
+    function exportData() {
+        saveAndCalculate();
+        const jsonStr = JSON.stringify(appData);
+        const encoded = btoa(encodeURIComponent(jsonStr));
+        navigator.clipboard.writeText(encoded).then(() => { alert("✅ 備用設定代碼已複製！"); })
+        .catch(() => { prompt("請手動複製這串代碼：", encoded); });
+    }
+
+    function importData() {
+        const input = prompt("請貼上「設定代碼」：");
+        if(input) {
+            try {
+                const newData = JSON.parse(decodeURIComponent(atob(input)));
+                if(confirm("確定要匯入這份設定嗎？目前的資料會被覆蓋喔！")) {
+                    appData = newData;
+                    saveStorageOnly();
+                    renderTabs();
+                    renderCurrentDay();
+                }
+            } catch (e) { alert("❌ 代碼格式錯誤，請重新確認！"); }
+        }
     }
 </script>
+
 </body>
 </html>
