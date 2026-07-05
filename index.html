@@ -254,7 +254,6 @@
         <button class="del-tab-btn" onclick="deleteCurrentDayTab()" title="刪除這一天">-</button>
     </div>
 
-    <!-- 1. 時間總量設定 -->
     <div class="time-config">
         <div class="time-capsule t-morning">
             <span class="time-label">🌅 早上</span>
@@ -279,7 +278,6 @@
         </div>
     </div>
 
-    <!-- 2. 進度條 (Sticky) -->
     <div class="monitor-panel">
         <div class="total-time-text" id="totalTimeText">等待任務數據...</div>
         <div class="bar-container">
@@ -288,21 +286,17 @@
         </div>
     </div>
 
-    <!-- 3. 任務清單 -->
     <div id="missionContainer" class="mission-grid"></div>
     <button class="add-btn" onclick="addNewTask()">➕ 新增偵探任務 (New Case)</button>
 </div>
 
-<!-- 4. 底部固定 EP 區 (達克比徽章版) -->
 <div class="ep-footer" id="epFooter">
     <div class="footer-inner">
-        <!-- 左側：設定類 -->
         <div class="tools-group">
             <button class="tool-btn" onclick="exportData()" title="📤 匯出設定 (單機備用)">📤</button>
             <button class="tool-btn" onclick="importData()" title="📥 匯入設定 (單機備用)">📥</button>
         </div>
         
-        <!-- 中間：EP 核心 (變身徽章) -->
         <div class="ep-badge-container" id="epBadge">
             <div class="ep-badge-img"></div>
             <div class="ep-score-overlay">
@@ -311,7 +305,6 @@
             </div>
         </div>
         
-        <!-- 右側：刪除類 -->
         <div class="tools-group">
             <button class="tool-btn btn-clear" onclick="clearCurrentDayTasks()" title="🧹 清空今日任務">🧹</button>
             <button class="tool-btn btn-reset" onclick="resetAllData()" title="重置所有資料">↻</button>
@@ -342,8 +335,9 @@
     function loadData() {
         document.getElementById('totalTimeText').innerText = "📡 正在連線至指揮中心雲端基地...";
         
-        // ★ 加入 redirect: "follow" 參數 ★
-        fetch(CLOUD_API_URL, { redirect: "follow" })
+        const noCacheUrl = CLOUD_API_URL + "?t=" + new Date().getTime();
+        
+        fetch(noCacheUrl, { redirect: "follow" })
             .then(response => response.json())
             .then(cloudData => {
                 if (cloudData && cloudData.days && cloudData.days.length > 0) {
@@ -367,16 +361,13 @@
     }
     
     function saveStorageOnly() {
-        // 1. 本機備份
         localStorage.setItem('ruichen_mission_cloud', JSON.stringify(appData));
         
-        // 2. 雲端同步寫入
-        // ★ 加入 redirect: "follow" 參數 ★
         fetch(CLOUD_API_URL, {
             method: "POST",
             mode: "no-cors",
             redirect: "follow", 
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
             body: JSON.stringify(appData)
         }).catch(error => console.error("雲端寫入失敗:", error));
     }
