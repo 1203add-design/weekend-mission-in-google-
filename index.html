@@ -314,7 +314,7 @@
 
 <script>
     // ==========================================
-    // ⚠️ 雲端資料庫 API 網址，請務必替換為您的佈署網址
+    // ⚠️ 已經替換為您的正確雲端資料庫 API 網址
     // ==========================================
     const CLOUD_API_URL = "https://script.google.com/macros/s/AKfycbwqcwJehYjK5J-kvBGnXRfaJvnv3I8Fd4Zn3UzYRXd6hQJ72dLO1rAlrhGBbmAcF6xJ5A/exec"; 
     
@@ -583,7 +583,34 @@
         }
     }
 
-    function resetAllData() { if(confirm("確定要重置所有資料嗎？所有的冒險記錄都會消失喔！")) { localStorage.removeItem('ruichen_mission_cloud'); location.reload(); } }
+    // ==========================================
+    // ⚠️ 正確清除雲端資料的重置功能
+    // ==========================================
+    function resetAllData() { 
+        if(confirm("確定要重置所有資料嗎？所有的冒險記錄都會消失，且雲端資料也會同步清空喔！")) { 
+            
+            appData = { currentIdx: 0, days: [] };
+            createDayData("第 1 天");
+            
+            document.getElementById('totalTimeText').innerText = "🧹 正在清除雲端與本機資料...";
+            
+            localStorage.removeItem('ruichen_mission_cloud'); 
+            
+            fetch(CLOUD_API_URL, {
+                method: "POST",
+                mode: "no-cors",
+                redirect: "follow", 
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(appData)
+            }).then(() => {
+                location.reload();
+            }).catch(error => {
+                console.error("重置失敗:", error);
+                location.reload();
+            });
+        } 
+    }
+
     function triggerFlash() { const badge = document.getElementById('epBadge'); badge.classList.remove('flash-active'); void badge.offsetWidth; badge.classList.add('flash-active'); }
 
     let qIdx = 0;
